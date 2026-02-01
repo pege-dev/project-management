@@ -177,6 +177,22 @@ The comment system enhances team collaboration:
 - Supports rich text formatting for improved readability
 - Enables better context sharing and decision documentation
 
+## AI Ticket Generation (New!)
+
+Generate initial project tickets automatically using OpenAI.
+
+1.  **Configure OpenAI API Key:**
+    Add your OpenAI API key to `.env` file:
+    ```env
+    OPENAI_API_KEY=sk-your-openai-api-key
+    OPENAI_MODEL=gpt-4o-mini
+    ```
+
+2.  **Usage:**
+    -   When creating a new project, check the "Generate tickets with AI" option.
+    -   (Optional) Add a custom prompt to guide the AI.
+    -   Click "Create" and wait for the notification.
+
 ## Google Login Integration
 
 This application supports Google OAuth login. Here's how to configure it:

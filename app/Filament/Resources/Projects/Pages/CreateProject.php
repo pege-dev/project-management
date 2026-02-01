@@ -31,5 +31,29 @@ class CreateProject extends CreateRecord
         if (auth()->check()) {
             $this->record->members()->syncWithoutDetaching(auth()->id());
         }
+
+        // AI Ticket Generation
+        if ($this->data['generate_tickets_with_ai'] ?? false) {
+            try {
+                $generator = app(\App\Services\TicketGeneratorService::class);
+                $count = $generator->generateForProject(
+                    project: $this->record,
+                    prompt: $this->data['ai_generation_prompt'] ?? null
+                );
+
+                \Filament\Notifications\Notification::make()
+                    ->success()
+                    ->title('Tiket berhasil di-generate')
+                    ->body("$count tiket telah dibuat untuk project ini")
+                    ->send();
+
+            } catch (\Exception $e) {
+                \Filament\Notifications\Notification::make()
+                    ->danger()
+                    ->title('Gagal generate tiket')
+                    ->body($e->getMessage())
+                    ->send();
+            }
+        }
     }
 }

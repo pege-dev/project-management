@@ -21,6 +21,10 @@ class Project extends Model
         'start_date',
         'end_date',
         'pinned_date',
+        'client_name',
+        'client_address',
+        'client_email',
+        'client_phone',
     ];
 
     protected $casts = [
@@ -32,6 +36,11 @@ class Project extends Model
     public function getIsPinnedAttribute(): bool
     {
         return !is_null($this->pinned_date);
+    }
+
+    public function invoices(): HasMany
+    {
+        return $this->hasMany(Invoice::class);
     }
 
     public function pin(): void

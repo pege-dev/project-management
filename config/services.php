@@ -40,4 +40,10 @@ return [
         'client_secret' => env('GOOGLE_CLIENT_SECRET'),
         'redirect' => env('APP_URL') . '/auth/google/callback',
     ],
+
+    'openai' => [
+        'api_key' => env('OPENAI_API_KEY'),
+        'model' => env('OPENAI_MODEL', 'gpt-4o-mini'),
+        'max_tokens' => env('OPENAI_MAX_TOKENS', 2000),
+    ],
 ];

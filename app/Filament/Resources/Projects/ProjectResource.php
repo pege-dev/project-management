@@ -39,6 +39,13 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
+use Filament\Forms\Components\Checkbox;
+use Filament\Forms\Components\Textarea;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Utilities\Get;
+
+use App\Filament\Resources\Projects\RelationManagers\InvoicesRelationManager;
+
 class ProjectResource extends Resource
 {
     protected static ?string $model = Project::class;
@@ -104,6 +111,24 @@ class ProjectResource extends Resource
                     ->displayFormat('d/m/Y H:i')
                     ->visible(fn($get) => $get('is_pinned'))
                     ->dehydrated(true),
+
+                Section::make('AI Ticket Generation')
+                    ->schema([
+                        Checkbox::make('generate_tickets_with_ai')
+                            ->label('Generate tiket awal dengan AI')
+                            ->live()
+                            ->default(false),
+
+                        Textarea::make('ai_generation_prompt')
+                            ->label('Prompt untuk AI (opsional)')
+                            ->placeholder('Contoh: Generate tiket untuk setup project e-commerce dengan fitur cart, checkout, dan payment')
+                            ->rows(3)
+                            ->visible(fn(Get $get) => $get('generate_tickets_with_ai'))
+                            ->helperText('Berikan konteks tambahan untuk menghasilkan tiket yang lebih spesifik'),
+                    ])
+                    ->collapsible()
+                    ->collapsed(fn(Get $get) => !$get('generate_tickets_with_ai'))
+                    ->visible(fn($livewire) => $livewire instanceof CreateProject),
             ]);
     }
 
@@ -127,10 +152,7 @@ class ProjectResource extends Resource
                     ->badge()
                     ->color(
                         fn(Project $record): string =>
-                        $record->progress_percentage >= 100 ? 'success' :
-                        ($record->progress_percentage >= 75 ? 'info' :
-                            ($record->progress_percentage >= 50 ? 'warning' :
-                                ($record->progress_percentage >= 25 ? 'gray' : 'danger')))
+                        $record->progress_percentage >= 100 ? 'success' : ($record->progress_percentage >= 75 ? 'info' : ($record->progress_percentage >= 50 ? 'warning' : ($record->progress_percentage >= 25 ? 'gray' : 'danger')))
                     )
                     ->sortable(),
                 TextColumn::make('start_date')
@@ -151,9 +173,7 @@ class ProjectResource extends Resource
                     ->badge()
                     ->color(
                         fn(Project $record): string =>
-                        !$record->end_date ? 'gray' :
-                        ($record->remaining_days <= 0 ? 'danger' :
-                            ($record->remaining_days <= 7 ? 'warning' : 'success'))
+                        !$record->end_date ? 'gray' : ($record->remaining_days <= 0 ? 'danger' : ($record->remaining_days <= 7 ? 'warning' : 'success'))
                     ),
                 ToggleColumn::make('is_pinned')
                     ->label('Pinned')
@@ -200,6 +220,7 @@ class ProjectResource extends Resource
             EpicsRelationManager::class,
             TicketsRelationManager::class,
             NotesRelationManager::class,
+            InvoicesRelationManager::class,
         ];
     }
 
